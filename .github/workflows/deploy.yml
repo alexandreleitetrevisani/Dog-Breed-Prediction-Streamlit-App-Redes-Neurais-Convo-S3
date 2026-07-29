@@ -44,10 +44,11 @@ jobs:
         run: terraform init
         working-directory: ./terraform
 
-      # 5. Criar o repositório ECR inicial
+      # 5. Criar o repositório ECR inicial (Alvo atualizado)
       - name: Terraform Target ECR
-        run: terraform apply -target=aws_ecr_repository.app -auto-approve
+        run: terraform apply -target=aws_ecr_repository.app_new -auto-approve
         working-directory: ./terraform
+
 
       # 6. Compilar e enviar a imagem Docker para o ECR
       - name: Build and Push Docker Image

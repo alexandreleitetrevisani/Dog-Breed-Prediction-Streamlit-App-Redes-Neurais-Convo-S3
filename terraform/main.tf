@@ -1,8 +1,9 @@
-# 1. Cria o Repositório de Imagens Docker (Amazon ECR)
-resource "aws_ecr_repository" "app" {
-  name                 = var.app_name
+resource "aws_ecr_repository" "app_new" {
+  name                 = var.app_name # Usará "streamlit-dog-app"
   image_tag_mutability = "MUTABLE"
 }
+
+
 
 # 2. Permissão para o App Runner puxar imagens do ECR
 resource "aws_iam_role" "apprunner_ecr_role" {
@@ -37,15 +38,18 @@ resource "aws_apprunner_service" "streamlit" {
       access_role_arn = aws_iam_role.apprunner_ecr_role.arn
     }
     image_repository {
-      image_identifier      = "${aws_ecr_repository.app.repository_url}:${var.image_tag}"
+      # Mudado de aws_ecr_repository.app.repository_url para aws_ecr_repository.app_new.repository_url
+      image_identifier      = "${aws_ecr_repository.app_new.repository_url}:${var.image_tag}"
       image_repository_type = "ECR"
       image_configuration {
         port          = "8501"
         start_command = "streamlit run app.py --server.port=8501 --server.address=0.0.0.0"
       }
     }
-    auto_deployments_enabled = false
+
   }
+    auto_deployments_enabled = false
+ 
 
   # REMOVEMOS O BLOCO DE HEALTH CHECK DAQUI
 
@@ -54,6 +58,7 @@ resource "aws_apprunner_service" "streamlit" {
     memory = "4096" 
   }
 }
+
 
 
 output "app_runner_url" {

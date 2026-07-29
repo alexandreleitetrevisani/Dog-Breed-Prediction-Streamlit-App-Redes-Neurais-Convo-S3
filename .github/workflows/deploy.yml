@@ -3,11 +3,11 @@ name: "AWS Deploy - App Runner & Terraform (IAM User)"
 on:
   push:
     branches:
-      - master
+      - master # Mantive master baseado na sua última execução, altere para main se mudou a branch
 
 env:
   AWS_REGION: "us-east-1"
-  ECR_REPOSITORY: "streamlit-dog-classifier" # Deve ser igual ao var.app_name do Terraform
+  ECR_REPOSITORY: "streamlit-dog-classifier"
 
 jobs:
   deploy:
@@ -19,9 +19,7 @@ jobs:
         uses: actions/checkout@v4
 
       # 1. Autenticação na AWS usando as chaves estáticas do seu IAM User existente
-      # Removeu-se o bloco "permissions" e o "role-to-assume"
-      # Agora lê diretamente os Segredos que configurou no passo anterior
-       Penthouse: Autenticar na AWS via IAM User
+      - name: Autenticar na AWS via IAM User
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}

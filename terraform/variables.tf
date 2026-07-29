@@ -3,10 +3,12 @@ variable "aws_region" {
   default = "us-east-1"
 }
 
+
 variable "app_name" {
   type    = string
-  default = "streamlit-dog-classifier"
+  default = "streamlit-dog-app" # Mudado de "streamlit-dog-classifier" para evitar o conflito
 }
+
 
 variable "image_tag" {
   type    = string

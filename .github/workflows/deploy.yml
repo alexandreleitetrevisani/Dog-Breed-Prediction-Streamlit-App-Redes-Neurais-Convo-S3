@@ -5,9 +5,11 @@ on:
     branches:
       - master # Mantive master baseado na sua última execução, altere para main se mudou a branch
 
+
 env:
   AWS_REGION: "us-east-1"
-  ECR_REPOSITORY: "streamlit-dog-classifier"
+  ECR_REPOSITORY: "streamlit-dog-app" # Deve ser igual ao novo var.app_name do Terraform
+
 
 jobs:
   deploy:

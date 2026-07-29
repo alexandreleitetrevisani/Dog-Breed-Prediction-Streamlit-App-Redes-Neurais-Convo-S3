@@ -4,11 +4,11 @@ FROM python:3.10-slim
 # Define o diretório de trabalho dentro do container
 WORKDIR /app
 
-# Instala dependências do sistema necessárias para o OpenCV e ferramentas básicas
 RUN apt-get update && apt-get install -y \
     build-essential \
-    software-properties-common \
     git \
+    libgl1 \
+    libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copia o ficheiro de requisitos e instala as bibliotecas Python

@@ -2,7 +2,6 @@
 resource "aws_ecr_repository" "app" {
   name                 = var.app_name
   image_tag_mutability = "MUTABLE"
-  force_destroy        = true # Permite apagar o repositório mesmo que tenha imagens dentro
 }
 
 # 2. Permissão para o App Runner puxar imagens do ECR

@@ -39,9 +39,10 @@ resource "aws_apprunner_service" "streamlit" {
       image_identifier      = "${aws_ecr_repository.app.repository_url}:${var.image_tag}"
       image_repository_type = "ECR"
       image_configuration {
-        port = "8501" # Porta do Streamlit configurada no Dockerfile
-        start_command = "streamlit run app.py --server.port=8501 --server.address=0.0.0.0"
+        port          = "8501"
+        start_command = "tail -f /dev/null" # Força o container a ficar ativo sem cair
       }
+ 
     }
     auto_deployments_enabled = false
   }

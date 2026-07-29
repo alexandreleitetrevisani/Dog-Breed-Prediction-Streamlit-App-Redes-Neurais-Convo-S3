@@ -13,10 +13,14 @@ resource "aws_iam_role" "apprunner_ecr_role" {
     Statement = [{
       Action    = "sts:AssumeRole"
       Effect    = "Allow"
-      Principal = { Service = "://amazonaws.com" }
+      Principal = { 
+        Service = "build.apprunner.amazonaws.com" 
+      }
     }]
   })
 }
+
+
 
 resource "aws_iam_role_policy_attachment" "apprunner_ecr_policy" {
   role       = aws_iam_role.apprunner_ecr_role.name

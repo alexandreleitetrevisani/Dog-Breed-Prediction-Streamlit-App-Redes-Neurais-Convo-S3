@@ -1,0 +1,46 @@
+name: "Terraform Destroy - Segurança Máxima (IAM User)"
+
+on:
+  workflow_dispatch: # Ativação estritamente manual para evitar acidentes.
+
+env:
+  AWS_REGION: "us-east-1"
+
+jobs:
+  destroy:
+    name: "Destroy AWS Infrastructure"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./terraform
+
+    steps:
+      - name: Checkout Código
+        uses: actions/checkout@v4
+
+      # 1. Autenticação na AWS usando as chaves estáticas do seu IAM User existente
+      - name: Autenticar na AWS via IAM User
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # 2. Configurar Terraform no Ambiente
+      - name: Configurar Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      # 3. Inicializar o Terraform (Conecta ao Bucket S3 e DynamoDB criados)
+      - name: Terraform Init
+        run: terraform init
+
+      # 4. Gera a antevisão da destruição (Bom para auditoria nos logs do GitHub)
+      - name: Terraform Plan Destroy
+        run: terraform plan -destroy
+
+      # 5. Executa a destruição real de todos os recursos da AWS
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
+

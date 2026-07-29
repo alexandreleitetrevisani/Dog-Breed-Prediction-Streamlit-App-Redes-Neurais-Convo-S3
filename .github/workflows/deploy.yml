@@ -1,0 +1,67 @@
+name: "AWS Deploy - App Runner & Terraform (IAM User)"
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: "us-east-1"
+  ECR_REPOSITORY: "streamlit-dog-classifier" # Deve ser igual ao var.app_name do Terraform
+
+jobs:
+  deploy:
+    name: "Build, Push and Deploy"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Código
+        uses: actions/checkout@v4
+
+      # 1. Autenticação na AWS usando as chaves estáticas do seu IAM User existente
+      # Removeu-se o bloco "permissions" e o "role-to-assume"
+      # Agora lê diretamente os Segredos que configurou no passo anterior
+       Penthouse: Autenticar na AWS via IAM User
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # 2. Login no Amazon ECR
+      - name: Login no Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # 3. Configurar Terraform
+      - name: Configurar Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      # 4. Inicializar o Terraform
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./terraform
+
+      # 5. Criar o repositório ECR inicial
+      - name: Terraform Target ECR
+        run: terraform apply -target=aws_ecr_repository.app -auto-approve
+        working-directory: ./terraform
+
+      # 6. Compilar e enviar a imagem Docker para o ECR
+      - name: Build and Push Docker Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
+          docker build -t $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest .
+          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest
+
+      # 7. Aplicar o App Runner apontando para a nova imagem
+      - name: Terraform Apply Completo
+        run: terraform apply -var="image_tag=${{ github.sha }}" -auto-approve
+        working-directory: ./terraform
+

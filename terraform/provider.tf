@@ -8,7 +8,7 @@ terraform {
   }
   # Configuração do backend remoto (Crie este bucket S3 e tabela DynamoDB manualmente antes)
   backend "s3" {
-    bucket         = "o-seu-bucket-terraform-state"
+    bucket         = "breed-dog-bucket-terra"
     key            = "streamlit-dog-app/terraform.tfstate"
     region         = "us-east-1"
     dynamodb_table = "terraform-lock-table"

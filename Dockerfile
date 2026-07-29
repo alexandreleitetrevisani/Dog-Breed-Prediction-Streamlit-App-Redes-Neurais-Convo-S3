@@ -4,6 +4,7 @@ FROM python:3.10-slim
 # Define o diretório de trabalho dentro do container
 WORKDIR /app
 
+# Instala as dependências do sistema obrigatórias para o OpenCV funcionar em ambientes Linux
 RUN apt-get update && apt-get install -y \
     build-essential \
     git \
@@ -11,9 +12,9 @@ RUN apt-get update && apt-get install -y \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copia o ficheiro de requisitos e instala as bibliotecas Python
+# Copia o ficheiro de requisitos e instala as bibliotecas Python de forma leve
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --no-compile -r requirements.txt
 
 # Copia todo o código do seu projeto (incluindo o script .py e o modelo .h5/.keras)
 COPY . .

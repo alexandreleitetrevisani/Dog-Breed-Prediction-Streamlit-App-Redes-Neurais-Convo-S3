@@ -27,6 +27,7 @@ resource "aws_iam_role_policy_attachment" "apprunner_ecr_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSAppRunnerServicePolicyForECRAccess"
 }
 
+
 # 3. O Serviço App Runner
 resource "aws_apprunner_service" "streamlit" {
   service_name = var.app_name
@@ -40,18 +41,20 @@ resource "aws_apprunner_service" "streamlit" {
       image_repository_type = "ECR"
       image_configuration {
         port          = "8501"
-        start_command = "tail -f /dev/null" # Força o container a ficar ativo sem cair
+        start_command = "streamlit run app.py --server.port=8501 --server.address=0.0.0.0"
       }
- 
     }
     auto_deployments_enabled = false
   }
 
+  # REMOVEMOS O BLOCO DE HEALTH CHECK DAQUI
+
   instance_configuration {
-    cpu    = "1024" # 1 vCPU
-    memory = "2048" # 2 GB RAM (Mínimo recomendado para Keras/TensorFlow leve)
+    cpu    = "2048" # Mantemos os 4GB de RAM para o Keras rodar folgado
+    memory = "4096" 
   }
 }
+
 
 output "app_runner_url" {
   value = aws_apprunner_service.streamlit.service_url
